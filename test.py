@@ -4,7 +4,7 @@ from queue import PriorityQueue
 
 WIDTH = 800
 WIN = pygame.display.set_mode((WIDTH, WIDTH))
-pygame.display.set_caption('A* Path Finding Algorithm')
+pygame.display.set_caption("A* Path Finding Algorithm")
 
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
@@ -20,23 +20,14 @@ TURQUOISE = (64, 224, 208)
 
 class Spot:
     def __init__(self, row, col, width, total_rows):
-        # Location of the spot at row and col level
         self.row = row
         self.col = col
-
-        # Dimension of the spot
-        self.width = width
-        self.total_rows = total_rows
-
-        # Starting color of spot
-        self.color = WHITE
-
-        # Location of the spot
         self.x = row * width
         self.y = col * width
-
-        # Tracking neighbours
+        self.color = WHITE
         self.neighbors = []
+        self.width = width
+        self.total_rows = total_rows
 
     def get_pos(self):
         return self.row, self.col
@@ -82,7 +73,6 @@ class Spot:
 
     def update_neighbors(self, grid):
         self.neighbors = []
-
         if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].is_barrier():  # DOWN
             self.neighbors.append(grid[self.row + 1][self.col])
 
@@ -117,9 +107,9 @@ def algorithm(draw, grid, start, end):
     open_set = PriorityQueue()
     open_set.put((0, count, start))
     came_from = {}
-    g_score = {spot: float('inf') for row in grid for spot in row}
+    g_score = {spot: float("inf") for row in grid for spot in row}
     g_score[start] = 0
-    f_score = {spot: float('inf') for row in grid for spot in row}
+    f_score = {spot: float("inf") for row in grid for spot in row}
     f_score[start] = h(start.get_pos(), end.get_pos())
 
     open_set_hash = {start}
@@ -142,14 +132,14 @@ def algorithm(draw, grid, start, end):
 
             if temp_g_score < g_score[neighbor]:
                 came_from[neighbor] = current
-                g_score[current] = temp_g_score
+                g_score[neighbor] = temp_g_score
                 f_score[neighbor] = temp_g_score + h(neighbor.get_pos(), end.get_pos())
-
                 if neighbor not in open_set_hash:
                     count += 1
                     open_set.put((f_score[neighbor], count, neighbor))
                     open_set_hash.add(neighbor)
                     neighbor.make_open()
+
         draw()
 
         if current != start:
@@ -161,7 +151,6 @@ def algorithm(draw, grid, start, end):
 def make_grid(rows, width):
     grid = []
     gap = width // rows
-
     for i in range(rows):
         grid.append([])
         for j in range(rows):
@@ -172,11 +161,11 @@ def make_grid(rows, width):
 
 
 def draw_grid(win, rows, width):
-    GAP = width // rows
+    gap = width // rows
     for i in range(rows):
-        pygame.draw.line(win, GREY, (0, i * GAP), (width, i * GAP))
+        pygame.draw.line(win, GREY, (0, i * gap), (width, i * gap))
         for j in range(rows):
-            pygame.draw.line(win, GREY, (j * GAP, 0), (j * GAP, width))
+            pygame.draw.line(win, GREY, (j * gap, 0), (j * gap, width))
 
 
 def draw(win, grid, rows, width):
@@ -208,18 +197,16 @@ def main(win, width):
     end = None
 
     run = True
-
     while run:
         draw(win, grid, ROWS, width)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
 
-            if pygame.mouse.get_pressed()[0]:
+            if pygame.mouse.get_pressed()[0]:  # LEFT
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, ROWS, width)
                 spot = grid[row][col]
-
                 if not start and spot != end:
                     start = spot
                     start.make_start()
@@ -231,12 +218,11 @@ def main(win, width):
                 elif spot != end and spot != start:
                     spot.make_barrier()
 
-            elif pygame.mouse.get_pressed()[2]:
+            elif pygame.mouse.get_pressed()[2]:  # RIGHT
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, ROWS, width)
                 spot = grid[row][col]
                 spot.reset()
-
                 if spot == start:
                     start = None
                 elif spot == end:
